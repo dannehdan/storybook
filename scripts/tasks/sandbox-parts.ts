@@ -121,14 +121,18 @@ export const install: Task['run'] = async ({ sandboxDir, template }, { link, dry
   logger.info(`🔢 Adding package scripts:`);
 
   const nodeOptions = [
-    ...process.env.NODE_OPTIONS.split(' '),
+    ...(process.env.NODE_OPTIONS || '').split(' '),
     '--preserve-symlinks',
     '--preserve-symlinks-main',
-  ];
+  ].filter(Boolean);
 
-  const prefix = `NODE_OPTIONS="${nodeOptions.join(
-    ' '
-  )}" STORYBOOK_TELEMETRY_URL="http://localhost:6007/event-log"`;
+  const pnp = await pathExists(join(cwd, '.yarnrc.yml'));
+  if (pnp && !nodeOptions.find((s) => s.includes('--require'))) {
+    nodeOptions.push('--require ./.pnp.cjs');
+  }
+
+  const nodeOptionsString = nodeOptions.join(' ');
+  const prefix = `NODE_OPTIONS="${nodeOptionsString}" STORYBOOK_TELEMETRY_URL="http://localhost:6007/event-log"`;
 
   await updatePackageScripts({
     cwd,
