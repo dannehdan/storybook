@@ -32,8 +32,6 @@ jest.mock('path', () => {
   };
 });
 
-const mockPackageManager = {} as JsPackageManager;
-
 describe('Helpers', () => {
   beforeEach(() => {
     jest.clearAllMocks();
