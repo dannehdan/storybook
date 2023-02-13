@@ -261,7 +261,7 @@ function setSandboxViteFinal(mainConfig: ConfigFile) {
 // Update the stories field to ensure that no TS files
 // that are linked from the renderer are picked up in non-TS projects
 function updateStoriesField(mainConfig: ConfigFile, isJs: boolean) {
-  const stories = mainConfig.getFieldValue(['stories']) as string[];
+  const stories = (mainConfig.getFieldValue(['stories']) || []) as string[];
 
   // If the project is a JS project, let's make sure any linked in TS stories from the
   // renderer inside src|stories are simply ignored.
@@ -274,7 +274,7 @@ function updateStoriesField(mainConfig: ConfigFile, isJs: boolean) {
 
 // Add a stories field entry for the passed symlink
 function addStoriesEntry(mainConfig: ConfigFile, path: string) {
-  const stories = mainConfig.getFieldValue(['stories']) as string[];
+  const stories = (mainConfig.getFieldValue(['stories']) ||[]) as string[];
 
   const entry = {
     directory: slash(join('../template-stories', path)),
@@ -362,6 +362,7 @@ export const addStories: Task['run'] = async (
   { sandboxDir, template, key },
   { addon: extraAddons, dryRun, debug }
 ) => {
+  logger.log('💃 adding stories');
   const cwd = sandboxDir;
   const storiesPath = await findFirstPath([join('src', 'stories'), 'stories'], { cwd });
 
@@ -428,7 +429,7 @@ export const addStories: Task['run'] = async (
     });
   }
 
-  const mainAddons = mainConfig.getFieldValue(['addons']).reduce((acc: string[], addon: any) => {
+  const mainAddons = (mainConfig.getFieldValue(['addons']) || []).reduce((acc: string[], addon: any) => {
     const name = typeof addon === 'string' ? addon : addon.name;
     const match = /@storybook\/addon-(.*)/.exec(name);
     if (!match) return acc;
