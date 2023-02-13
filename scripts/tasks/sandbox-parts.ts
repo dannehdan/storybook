@@ -126,7 +126,7 @@ export const install: Task['run'] = async ({ sandboxDir, template }, { link, dry
     '--preserve-symlinks-main',
   ].filter(Boolean);
 
-  const pnp = await pathExists(join(cwd, '.yarnrc.yml'));
+  const pnp = await pathExists(join(cwd, '.pnp.cjs')).catch(() => {});
   if (pnp && !nodeOptions.find((s) => s.includes('--require'))) {
     nodeOptions.push('--require ./.pnp.cjs');
   }
