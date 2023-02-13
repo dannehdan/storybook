@@ -187,6 +187,7 @@ export function copyTemplate(templateRoot: string, destination = '.') {
 }
 
 export async function copyComponents(
+  packageManager: JsPackageManager,
   renderer: SupportedFrameworks | SupportedRenderers,
   language: SupportedLanguage,
   destination?: string
@@ -197,7 +198,7 @@ export async function copyComponents(
     [SupportedLanguage.TYPESCRIPT_LEGACY]: 'ts-legacy',
   };
   const componentsPath = async () => {
-    const baseDir = getRendererDir(renderer);
+    const baseDir = await getRendererDir(packageManager, renderer);
     const assetsDir = join(baseDir, 'template/cli');
 
     const assetsLanguage = join(assetsDir, languageFolderMapping[language]);
@@ -223,7 +224,7 @@ export async function copyComponents(
     if (await fse.pathExists(assetsDir)) {
       return assetsDir;
     }
-    throw new Error(`Unsupported renderer: ${renderer}`);
+    throw new Error(`Unsupported renderer: ${renderer} (${baseDir})`);
   };
 
   const targetPath = async () => {

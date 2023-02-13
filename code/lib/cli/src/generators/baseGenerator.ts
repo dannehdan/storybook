@@ -91,7 +91,6 @@ const getFrameworkDetails = (
   rendererId: SupportedRenderers;
 } => {
   const frameworkPackage = getFrameworkPackage(framework, renderer, builder);
-
   const frameworkPackagePath = pnp ? wrapForPnp(frameworkPackage) : frameworkPackage;
 
   const rendererPackage = getRendererPackage(framework, renderer);
@@ -309,6 +308,6 @@ export async function baseGenerator(
 
   if (addComponents) {
     const templateLocation = hasFrameworkTemplates(framework) ? framework : rendererId;
-    await copyComponents(templateLocation, language, componentsDestinationPath);
+    await copyComponents(packageManager, templateLocation, language, componentsDestinationPath);
   }
 }
