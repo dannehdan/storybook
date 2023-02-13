@@ -2,6 +2,7 @@ import fs from 'fs';
 import fse from 'fs-extra';
 
 import * as helpers from './helpers';
+import type { JsPackageManager } from './js-package-manager';
 import type { SupportedRenderers } from './project_types';
 import { SupportedLanguage } from './project_types';
 
@@ -9,7 +10,7 @@ jest.mock('fs', () => ({
   existsSync: jest.fn(),
 }));
 jest.mock('./dirs', () => ({
-  getRendererDir: (renderer: string) => `@storybook/${renderer}`,
+  getRendererDir: (_: JsPackageManager, renderer: string) => `@storybook/${renderer}`,
   getCliDir: () => '@storybook/cli',
 }));
 
@@ -30,6 +31,8 @@ jest.mock('path', () => {
     join: path.join,
   };
 });
+
+const mockPackageManager = {} as JsPackageManager;
 
 describe('Helpers', () => {
   beforeEach(() => {
@@ -76,7 +79,7 @@ describe('Helpers', () => {
         (filePath) =>
           componentsDirectory.includes(filePath) || filePath === '@storybook/react/template/cli'
       );
-      await helpers.copyComponents('react', language);
+      await helpers.copyComponents(mockPackageManager, 'react', language);
 
       const copySpy = jest.spyOn(fse, 'copy');
       expect(copySpy).toHaveBeenNthCalledWith(
@@ -95,7 +98,7 @@ describe('Helpers', () => {
     (fse.pathExists as jest.Mock).mockImplementation((filePath) => {
       return filePath === '@storybook/react/template/cli' || filePath === './src';
     });
-    await helpers.copyComponents('react', SupportedLanguage.JAVASCRIPT);
+    await helpers.copyComponents(mockPackageManager, 'react', SupportedLanguage.JAVASCRIPT);
     expect(fse.copy).toHaveBeenCalledWith(expect.anything(), './src/stories', expect.anything());
   });
 
@@ -103,7 +106,7 @@ describe('Helpers', () => {
     (fse.pathExists as jest.Mock).mockImplementation((filePath) => {
       return filePath === '@storybook/react/template/cli';
     });
-    await helpers.copyComponents('react', SupportedLanguage.JAVASCRIPT);
+    await helpers.copyComponents(mockPackageManager, 'react', SupportedLanguage.JAVASCRIPT);
     expect(fse.copy).toHaveBeenCalledWith(expect.anything(), './stories', expect.anything());
   });
 
@@ -111,7 +114,7 @@ describe('Helpers', () => {
     const renderer = 'unknown renderer' as SupportedRenderers;
     const expectedMessage = `Unsupported renderer: ${renderer}`;
     await expect(
-      helpers.copyComponents(renderer, SupportedLanguage.JAVASCRIPT)
+      helpers.copyComponents(mockPackageManager, renderer, SupportedLanguage.JAVASCRIPT)
     ).rejects.toThrowError(expectedMessage);
   });
 
