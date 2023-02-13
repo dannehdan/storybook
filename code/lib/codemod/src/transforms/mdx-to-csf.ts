@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import type { API, FileInfo } from 'jscodeshift';
-import { babelParse } from '@storybook/csf-tools';
+import { babelParse, babelParseExpression, parserOptions } from '@storybook/csf-tools';
 import { remark } from 'remark';
 import remarkMdx from 'remark-mdx';
 import visit from 'unist-util-visit';
@@ -14,12 +14,15 @@ import * as recast from 'recast';
 import * as path from 'node:path';
 import { dedent } from 'ts-dedent';
 import { capitalize } from 'lodash';
+import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
+import { attribute } from 'unist-util-select/lib/attribute';
+import * as parser from '@babel/parser';
+import * as generate from '@babel/generator';
+import prettier from 'prettier';
 
 export default function (info: FileInfo, api: API, options: { parser?: string }) {
   const fileName = path.basename(info.path);
   const [root] = transform(info.source, fileName);
-
-  console.log(root);
 
   return root;
 
@@ -63,7 +66,7 @@ export function transform(
 
     esm.push(node.value);
   });
-  const esmSource = esm.join('\n');
+  const esmSource = `${esm.join('\n\n')}`;
 
   const ast: t.File = babelParse(esmSource);
   // @ts-expect-error File is not yet exposed, see https://github.com/babel/babel/issues/11350#issuecomment-644118606
@@ -89,9 +92,12 @@ export function transform(
     }
   });
 
-  const metaAttributes = [];
+  const metaAttributes: Array<MdxJsxAttribute | MdxJsxExpressionAttribute> = [];
 
-  const storiesMap = new Map<string, { attributes: unknown; children: unknown[] }>();
+  const storiesMap = new Map<
+    string,
+    { attributes: Array<MdxJsxAttribute | MdxJsxExpressionAttribute>; children: unknown[] }
+  >();
 
   visit(
     root,
@@ -144,27 +150,128 @@ export function transform(
 
   // rewrite exports to normal variables
 
+  const metaProperties = metaAttributes.flatMap((attribute) => {
+    if (attribute.type === 'mdxJsxAttribute') {
+      if (typeof attribute.value === 'string') {
+        return [t.objectProperty(t.identifier(attribute.name), t.stringLiteral(attribute.value))];
+      }
+      return [
+        t.objectProperty(t.identifier(attribute.name), babelParseExpression(attribute.value.value)),
+      ];
+    }
+    return [];
+  });
+
   file.path.traverse({
     ExportNamedDeclaration(path) {
       path.replaceWith(path.node.declaration);
     },
   });
 
-  file.path.traverse({
-    Program(path) {
-      const body = path.get('body');
-      const last = body[body.length - 1];
+  // file.path.traverse({
+  //   Statement(path) {
+  //     path.insertAfter(t.exportDefaultDeclaration(t.objectExpression([])));
+  //
+  //     //
+  //     // const last = path.get('body').pop();
+  //     //
+  //     // console.log(last);
+  //     //
+  //     // path.node.body.push();
+  //
+  //     // body.push();
+  //     // path.get('body').push();
+  //   },
+  // });
 
-      last.insertAfter(t.exportDefaultDeclaration(t.objectExpression([])));
-      // body.push();
-      // path.get('body').push();
-    },
+  const body = file.path.get('body');
+  const last = body[body.length - 1];
+
+  const newStatements: t.Statement[] = [];
+
+  newStatements.push(t.exportDefaultDeclaration(t.objectExpression(metaProperties)));
+
+  const mapChildrenToRender = (children: unknown[]) => {
+    const child = children[0];
+
+    if (!child) return undefined;
+
+    if (child.type === 'mdxFlowExpression') {
+      const expression = babelParseExpression(child.value);
+      const BIND_REGEX = /\.bind\(.*\)/;
+      if (BIND_REGEX.test(child.value)) {
+        return expression;
+      }
+      return t.arrowFunctionExpression([], expression);
+    }
+  };
+
+  storiesMap.forEach((value, key) => {
+    console.log(value.children);
+    const renderProperty = mapChildrenToRender(value.children);
+    newStatements.push(
+      t.exportNamedDeclaration(
+        t.variableDeclaration('const', [
+          t.variableDeclarator(
+            t.identifier(key),
+            t.objectExpression([
+              ...(renderProperty
+                ? [t.objectProperty(t.identifier('render'), mapChildrenToRender(value.children))]
+                : []),
+              ...value.attributes.flatMap((attribute) => {
+                if (attribute.type === 'mdxJsxAttribute') {
+                  if (typeof attribute.value === 'string') {
+                    return [
+                      t.objectProperty(
+                        t.identifier(attribute.name),
+                        t.stringLiteral(attribute.value)
+                      ),
+                    ];
+                  }
+                  return [
+                    t.objectProperty(
+                      t.identifier(attribute.name),
+                      babelParseExpression(attribute.value.value)
+                    ),
+                  ];
+                }
+                return [];
+              }),
+            ])
+          ),
+        ])
+      )
+    );
   });
 
-  console.log(metaAttributes, storiesMap);
+  last.insertAfter(newStatements);
+  // last.insertAfter(t.exportNamedDeclaration(t.objectExpression([])));
 
   const newMdx = remark().use(remarkMdx).stringify(root) as unknown as string;
-  const output = recast.print(file.path.node).code;
+  console.log(file.path.node);
+  let output = recast.print(file.path.node).code;
+
+  const prettierConfig = prettier.resolveConfig.sync('.', { editorconfig: true }) || {
+    printWidth: 100,
+    tabWidth: 2,
+    bracketSpacing: true,
+    trailingComma: 'es5',
+    singleQuote: true,
+  };
+
   const newFileName = `${baseName}.stories.tsx`;
+
+  output = prettier.format(output, { ...prettierConfig, filepath: newFileName });
   return [newMdx, output, newFileName];
 }
+
+// const x = {
+//   render: (...a) => {
+//     const received = ();
+//     return typeof received === 'function' ? received(...a) : received;
+//   }
+// }
+
+export const b = {
+  //asdf
+};

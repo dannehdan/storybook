@@ -111,16 +111,108 @@ describe('mdx-to-csf', () => {
     `);
     expect(csf).toMatchInlineSnapshot(`
       import { Canvas, Meta, Story } from '@storybook/blocks';
+
       const args = { bla: 1 };
-      
-      export default { title: 'adsfasdf' 
-      
-      export const Foo = {}
+
+      export default {
+        title: 'foobar',
+      };
+
+      export const Foo = {
+        name: 'foo',
+      };
+
       export const Unchecked = {
-        args: {args},
-        render: () => {children},
-      }
+        render: Template.bind({}),
+        name: 'Unchecked',
+
+        args: {
+          ...args,
+          label: 'Unchecked',
+        },
+      };
+
     `);
+
     expect(newFileName).toMatchInlineSnapshot(`Foobar.stories.tsx`);
+  });
+
+  it('extract all meta parameters', () => {
+    const input = dedent`
+      import { Meta } from '@storybook/addon-docs';
+
+      export const args = { bla: 1 };
+      
+      <Meta title="foobar" args={{...args}} parameters={{a: '1'}} />
+    `;
+
+    const [, csf] = transform(input, 'Foobar.stories.mdx');
+
+    expect(csf).toMatchInlineSnapshot(`
+      import { Meta } from '@storybook/blocks';
+
+      const args = { bla: 1 };
+
+      export default {
+        title: 'foobar',
+
+        args: {
+          ...args,
+        },
+
+        parameters: {
+          a: '1',
+        },
+      };
+
+    `);
+  });
+
+  it('extract all story attributes', () => {
+    const input = dedent`
+      import { Meta, Story } from '@storybook/addon-docs';
+
+      export const args = { bla: 1 };
+      
+      <Meta title="foobar" />
+
+      <Story name="foo">bar</Story>
+      
+      <Story 
+        name="Unchecked"
+        args={{
+          ...args,
+          label: 'Unchecked',
+        }}>    
+        {Template.bind({})}
+      </Story>
+    `;
+
+    const [, csf] = transform(input, 'Foobar.stories.mdx');
+
+    expect(csf).toMatchInlineSnapshot(`
+      import { Meta, Story } from '@storybook/blocks';
+
+      const args = { bla: 1 };
+
+      export default {
+        title: 'foobar',
+      };
+
+      export const Foo = {
+        name: 'foo',
+      };
+
+      export const Unchecked = {
+        render: Template.bind({}),
+        name: 'Unchecked',
+
+        args: {
+          ...args,
+          label: 'Unchecked',
+        },
+      };
+
+    `);
   });
 });
