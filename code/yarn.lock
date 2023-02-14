@@ -3152,22 +3152,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lerna/child-process@npm:6.5.0":
-  version: 6.5.0
-  resolution: "@lerna/child-process@npm:6.5.0"
+"@lerna/child-process@npm:6.5.1":
+  version: 6.5.1
+  resolution: "@lerna/child-process@npm:6.5.1"
   dependencies:
     chalk: ^4.1.0
     execa: ^5.0.0
     strong-log-transformer: ^2.1.0
-  checksum: 0e2dfb95d3c7a3d4d38c166159a2c33b7cfdeadf368d1b8ac9cc3eb7d330582d9e450239bd0c2a8cccc09d218befdb2d684f87fbdc18c3406ed35bd559cd008e
+  checksum: 45de04bc3a226b2d461c1e7a550cee3fff01141bea0b621cb2ed400561a6918a7580fa69927452ca89da85f2d7679cc332211ed80308b0dc3df636040270d0dd
   languageName: node
   linkType: hard
 
-"@lerna/create@npm:6.5.0":
-  version: 6.5.0
-  resolution: "@lerna/create@npm:6.5.0"
+"@lerna/create@npm:6.5.1":
+  version: 6.5.1
+  resolution: "@lerna/create@npm:6.5.1"
   dependencies:
-    "@lerna/child-process": 6.5.0
+    "@lerna/child-process": 6.5.1
     dedent: ^0.7.0
     fs-extra: ^9.1.0
     init-package-json: ^3.0.2
@@ -3180,7 +3180,7 @@ __metadata:
     validate-npm-package-license: ^3.0.4
     validate-npm-package-name: ^4.0.0
     yargs-parser: 20.2.4
-  checksum: 54c92229dd52c097af3479be071e38d9b22e7fe022a5feab1203129d348725c3fc0651f30967486b676e2e3216e2415ef5957e5fd4b22a790edd8e229aa0abfa
+  checksum: 8c26a045d27d9fb09fff7b56ebbd2b11bb717ab3c6375949472fcc510514e1a94e5b12b4d1682de2ed38c5955307e2529cc32e315c3f76bd1640a6c655b2d688
   languageName: node
   linkType: hard
 
@@ -5484,11 +5484,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@storybook/core-common@workspace:lib/core-common"
   dependencies:
-    "@babel/core": ^7.20.2
     "@storybook/node-logger": 7.0.0-beta.47
     "@storybook/types": 7.0.0-beta.47
-    "@types/babel__core": ^7.1.20
-    "@types/express": ^4.7.0
     "@types/mock-fs": ^4.13.1
     "@types/node": ^16.0.0
     "@types/picomatch": ^2.3.0
@@ -5496,7 +5493,6 @@ __metadata:
     chalk: ^4.1.0
     esbuild: ^0.16.4
     esbuild-register: ^3.3.3
-    express: ^4.17.3
     file-system-cache: ^2.0.0
     find-up: ^5.0.0
     fs-extra: ^11.1.0
@@ -7259,7 +7255,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/babel__core@npm:^7, @types/babel__core@npm:^7.0.0, @types/babel__core@npm:^7.1.14, @types/babel__core@npm:^7.1.20":
+"@types/babel__core@npm:^7, @types/babel__core@npm:^7.0.0, @types/babel__core@npm:^7.1.14":
   version: 7.20.0
   resolution: "@types/babel__core@npm:7.20.0"
   dependencies:
@@ -8226,9 +8222,9 @@ __metadata:
   linkType: hard
 
 "@types/which@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "@types/which@npm:2.0.1"
-  checksum: 70bdcc57ef4cad876d05def62dbec098cdb3f09c708568e5bba97e6c7a5f1814653da04140720d5e45246cb0db4dad37e64c010987aa20cfe72329db4219415b
+  version: 2.0.2
+  resolution: "@types/which@npm:2.0.2"
+  checksum: c9a2ca5f1d4ca26381cd8adc7415f9e203fa5bfa2f7855c68bc5b676dc402f9c31bd8c83766bfa73d7aa70a0f4b979e7eb139ceec41a17ac2e1fc08a5bca6ba8
   languageName: node
   linkType: hard
 
@@ -19312,11 +19308,11 @@ __metadata:
   linkType: hard
 
 "lerna@npm:^6.4.0":
-  version: 6.5.0
-  resolution: "lerna@npm:6.5.0"
+  version: 6.5.1
+  resolution: "lerna@npm:6.5.1"
   dependencies:
-    "@lerna/child-process": 6.5.0
-    "@lerna/create": 6.5.0
+    "@lerna/child-process": 6.5.1
+    "@lerna/create": 6.5.1
     "@npmcli/arborist": 5.3.0
     "@npmcli/run-script": 4.1.7
     "@nrwl/devkit": ">=15.5.2 < 16"
@@ -19349,6 +19345,7 @@ __metadata:
     inquirer: ^8.2.4
     is-ci: 2.0.0
     is-stream: 2.0.0
+    js-yaml: ^4.1.0
     libnpmaccess: 6.0.3
     libnpmpublish: 6.0.4
     load-json-file: 6.2.0
@@ -19392,7 +19389,7 @@ __metadata:
     yargs-parser: 20.2.4
   bin:
     lerna: dist/cli.js
-  checksum: 060fe3a2a5f1569483c84672fb5abf07b91a7efead7e06f05a8df6daa9a62b17a045af700c2039cdfaa9905903308a61d8eec5319aea0afce14f4379234c9364
+  checksum: 4b17d5cf2c2df3cbe33e3efcc6c77906555df2d1539a37dedd755600629db2e9405c5bff19c86e4a4d45ef27c8761c5a633aa2827f3ff47b061b7327baba56f7
   languageName: node
   linkType: hard
 

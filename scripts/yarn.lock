@@ -3630,9 +3630,9 @@ __metadata:
   linkType: hard
 
 "@types/which@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "@types/which@npm:2.0.1"
-  checksum: 70bdcc57ef4cad876d05def62dbec098cdb3f09c708568e5bba97e6c7a5f1814653da04140720d5e45246cb0db4dad37e64c010987aa20cfe72329db4219415b
+  version: 2.0.2
+  resolution: "@types/which@npm:2.0.2"
+  checksum: c9a2ca5f1d4ca26381cd8adc7415f9e203fa5bfa2f7855c68bc5b676dc402f9c31bd8c83766bfa73d7aa70a0f4b979e7eb139ceec41a17ac2e1fc08a5bca6ba8
   languageName: node
   linkType: hard
 
